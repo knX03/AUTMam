@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kn.musicmanagement.mapper.SongMapper">
+
+    <insert id="saveSong">
+        insert into song (id, name, type, description)
+            value (null, #{name}, #{type}, #{description})
+    </insert>
+    <update id="ApprovedSong">
+        update song
+        set examine=1
+        where song_ID = #{song_ID}
+    </update>
+    <update id="banSong">
+        update song
+        set examine= -1
+        where song_ID = #{song_ID}
+    </update>
+    <update id="arriveSong">
+        update song
+        set examine= 1
+        where song_ID = #{song_ID}
+    </update>
+    <select id="getById" resultType="com.kn.musicmanagement.pojo.Song">
+        select *
+        from song
+        where id = #{id}
+    </select>
+    <select id="getAll" resultType="com.kn.musicmanagement.pojo.Song">
+        select song_ID, song_name, singer_name, album_name
+        from song,
+             singer,
+             album
+        where song.singer_ID = singer.singer_ID
+          and song.album_ID = album.album_ID
+          and examine != 0
+    </select>
+    <select id="getDirectory" resultType="java.lang.String">
+        select song_directory
+        from song
+        where id = #{id}
+    </select>
+    <select id="getUnapprovedSong" resultType="com.kn.musicmanagement.pojo.Song">
+        select song_ID, song_name, singer_name, album_name, created_time,song_directory
+        from song,
+             singer,
+             album
+        where examine = 0
+          and song.singer_ID = singer.singer_ID
+          and song.album_ID = album.album_ID
+    </select>
+    <select id="getBanSong" resultType="com.kn.musicmanagement.pojo.Song">
+        select song_ID, song_name, singer_name, album_name, created_time, song_directory
+        from song,
+             singer,
+             album
+        where examine = -1
+          and song.singer_ID = singer.singer_ID
+          and song.album_ID = album.album_ID
+    </select>
+    <select id="getEmailByUserID" resultType="com.kn.musicmanagement.pojo.User">
+        select user.user_ID, user.user_name, user_email
+        from user,
+             song,
+             singer
+        where song.song_ID = #{songID}
+          and song.singer_ID = singer.singer_ID
+          and singer.user_ID = user.user_ID
+    </select>
+</mapper>
